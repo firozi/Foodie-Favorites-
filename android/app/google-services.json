@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "818759700583",
+    "project_id": "delicious-food-b9f62",
+    "storage_bucket": "delicious-food-b9f62.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818759700583:android:6fbc00b24dcae85024c4c2",
+        "android_client_info": {
+          "package_name": "com.delicious.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC99X7oX4QF1tER3waGua_y4F68ob4W3A4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
