@@ -6,8 +6,9 @@ import 'package:delicious_food/Screens/wallet_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottemNavBar extends StatefulWidget {
-  const BottemNavBar({Key? key}) : super(key: key);
 
+   BottemNavBar({super.key,required this.name});
+  final String name;
   @override
   _BottemNavBarState createState() => _BottemNavBarState();
 }
@@ -18,7 +19,7 @@ class _BottemNavBarState extends State<BottemNavBar> {
 
   @override
   void initState() {
-    Screens = [HomeScreen(), OrderScreen(), WalletScreen(), ProfileScreen()];
+    Screens = [HomeScreen(name: widget.name,), OrderScreen(), WalletScreen(), ProfileScreen()];
   }
 
   @override

@@ -1,9 +1,13 @@
+import 'package:delicious_food/Admin/admin_login_screen.dart';
 import 'package:delicious_food/Screens/home_screen.dart';
 import 'package:delicious_food/Screens/login_screen.dart';
 import 'package:delicious_food/bottem_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'firebase_options.dart';
 
 
@@ -14,7 +18,8 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  runApp( ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

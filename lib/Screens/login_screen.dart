@@ -1,4 +1,6 @@
+import 'package:delicious_food/Screens/forget_password_screen.dart';
 import 'package:delicious_food/Screens/sign_up_screen.dart';
+import 'package:delicious_food/StoringInFirebase.dart';
 import 'package:delicious_food/bottem_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,29 +13,44 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final email=TextEditingController();
+  final email = TextEditingController();
 
-  final password=TextEditingController();
+  final password = TextEditingController();
 
-late String Email;
+  String? Emailhere;
 
-late String Password;
+  String? Passwordhere;
 
-  void LogIn()async{
-    Email=email.text;
-    Password=password.text;
-    if(Email==""||Password==""){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("enter email and password")));
+  bool isLogin = false;
+
+  void LogIn() async {
+    Emailhere = email.text;
+    Passwordhere = password.text;
+    if (Emailhere == "" || Passwordhere == "") {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("enter email and password")));
       return;
     }
-    try{
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: Email, password: Password);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BottemNavBar()));
-    }on FirebaseException catch(e){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("error ${e.code}")));
+    try {
+      setState(() {
+        isLogin = true;
+      });
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: Emailhere!, password: Passwordhere!);
+      final Data = await StoreData().getUserDetail(Emailhere!);
+      print("GEtTING BACK DATA ${Data}");
+      setState(() {
+        isLogin = false;
+      });
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => BottemNavBar(name: Data?['name'])));
+    } on FirebaseException catch (e) {
+      isLogin = false;
+      setState(() {});
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("error ${e.code}")));
     }
-
-
   }
 
   @override
@@ -56,8 +73,10 @@ late String Password;
                 ),
                 Text(
                   "Login",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold,color:
-                  Colors.white),
+                  style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 TextField(
                   controller: email,
@@ -65,18 +84,17 @@ late String Password;
                   decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                    hintText: "Enter email",
-                    prefixIcon: Icon(Icons.email_outlined)
-                  ),
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)),
+                      hintText: "Enter email",
+                      prefixIcon: Icon(Icons.email_outlined)),
                 ),
                 SizedBox(
                   height: 20,
                 ),
                 TextField(
-                  controller: password,
-                  obscureText: true,
+                    controller: password,
+                    obscureText: true,
                     cursorColor: Colors.white,
                     decoration: InputDecoration(
                         enabledBorder: UnderlineInputBorder(
@@ -84,12 +102,18 @@ late String Password;
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.white)),
                         hintText: "Password",
-                        prefixIcon: Icon(Icons.key)
-                    )
-                ),
+                        prefixIcon: Icon(Icons.key))),
                 Container(
                   alignment: Alignment.topRight,
-                  child: TextButton(onPressed: (){}, child: Text("Forget password ?",style: TextStyle(color:Colors.white),)),
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ForgetPasswordScreen()));
+                      },
+                      child: Text(
+                        "Forget password ?",
+                        style: TextStyle(color: Colors.white),
+                      )),
                 ),
                 SizedBox(
                   height: 40,
@@ -99,8 +123,20 @@ late String Password;
                     backgroundColor: MaterialStateProperty.all(Colors.white),
                     foregroundColor: MaterialStateProperty.all(Colors.black),
                   ),
-                  onPressed: (){LogIn();}, child: Text("Login"),),
-                TextButton(onPressed: (){Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SignUpScreen()));}, child: Text("Don't have an account, Sign up",style: TextStyle(color: Colors.white),))
+                  onPressed: () {
+                    LogIn();
+                  },
+                  child: isLogin ? CircularProgressIndicator() : Text("Login"),
+                ),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => SignUpScreen()));
+                    },
+                    child: Text(
+                      "Don't have an account, Sign up",
+                      style: TextStyle(color: Colors.white),
+                    ))
               ],
             ),
           ),

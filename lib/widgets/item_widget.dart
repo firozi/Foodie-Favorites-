@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class ItemWidget extends StatefulWidget {
@@ -5,8 +7,8 @@ class ItemWidget extends StatefulWidget {
 
   final String Title;
   final String subTitle;
-  final int Price;
-  final String ImagePath;
+  final String Price;
+  final File ImagePath;
   @override
   _ItemWidgetState createState() => _ItemWidgetState();
 }
@@ -24,8 +26,8 @@ class _ItemWidgetState extends State<ItemWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                widget.ImagePath.toString(),
+              Image.file(
+                widget.ImagePath,
                 height: 150,
                 width: 150,
                 fit: BoxFit.cover,
@@ -42,11 +44,12 @@ class _ItemWidgetState extends State<ItemWidget> {
                     fontWeight: FontWeight.bold,
                     color: Colors.grey),
               ),
-               Text(
-                "\$"+widget.Price.toString(),
+               Text("\$"+widget.Price,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
+
             ],
+
           ),
         ),
       ),

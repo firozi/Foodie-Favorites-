@@ -1,7 +1,9 @@
+import 'package:delicious_food/StoringInFirebase.dart';
 import 'package:delicious_food/bottem_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -24,19 +26,44 @@ late String Password;
 
 late String Email;
 
+bool isSignUp=false;
+
  void SignUp()async{
     Name=name.text;
     Password=password.text;
     Email=email.text;
      if(Name==""||Password==""||Email==""){
+       ScaffoldMessenger.of(context).clearSnackBars();
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Something is Missing...try again. ")));
        return;
      }
      try{
-       final userCredential=await FirebaseAuth.instance.createUserWithEmailAndPassword(email: Email, password: Password);
+       setState(() {
+         isSignUp=true;
+       });
+
+       await FirebaseAuth.instance.createUserWithEmailAndPassword(email: Email, password: Password);
+       ScaffoldMessenger.of(context).clearSnackBars();
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Registered Successfully")));
-       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BottemNavBar()));
+       String Id=randomAlphaNumeric(10);
+       Map<String ,dynamic> addUserInfo={
+         "name":Name,
+         "password":Password,
+         "email":Email,
+         "wallet":0,
+         "id":Id
+       };
+       await StoreData().addUserDetail(addUserInfo, Email);
+       setState(() {
+         isSignUp=false;
+       });
+
+       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BottemNavBar(name: Name,)));
      }on FirebaseException catch(e){
+       setState(() {
+         isSignUp=false;
+       });
+       ScaffoldMessenger.of(context).clearSnackBars();
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("error , ${e.code}")));
      }
 
@@ -116,7 +143,7 @@ late String Email;
                     backgroundColor: MaterialStateProperty.all(Colors.white),
                     foregroundColor: MaterialStateProperty.all(Colors.black),
                   ),
-                  onPressed: (){SignUp();}, child: Text("Sign Up"),),
+                  onPressed: (){SignUp();}, child:isSignUp?CircularProgressIndicator(): Text("Sign Up"),),
                 TextButton(onPressed: (){
                   Navigator.of(context).pop();
                 }, child: Text("Already have an account ? login",style: TextStyle(color: Colors.white),))

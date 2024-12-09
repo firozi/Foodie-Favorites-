@@ -1,33 +1,68 @@
+import 'package:delicious_food/Screens/food_details.dart';
+import 'package:delicious_food/module/FoodCardModule.dart';
 import 'package:delicious_food/widgets/item_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+import '../Data/AllMeals.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  HomeScreen({super.key, required this.name});
+
+  final String name;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  bool IceCream = false, burger = false, pizza = false, salad = false;
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,) {
+    Widget content = Text("No item Here,add item through admin panel");
+    List AllFood = ref.watch(allFoodProvider);
+    if (AllFood.isNotEmpty) {
+      content = Container(
+        height: 250,
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: AllFood.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => FoodDetails(
+                             food: AllFood[index])));
+                  },
+                  child: ItemWidget(
+                    ImagePath: AllFood[index].imagePath,
+                    Title: AllFood[index].ItemName,
+                    subTitle: AllFood[index].ItemDetails,
+                    Price: AllFood[index].ItemPrice,
+                  ));
+            }),
+      );
+    }
     return Scaffold(
       body: Container(
-        margin:const EdgeInsets.only(top: 50, left: 20, right: 20),
+        margin: const EdgeInsets.only(top: 50, left: 20, right: 20),
         child: Column(
+
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  child: const Text(
-                    "Hello Firoz,",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
+                  child: widget.name == null
+                      ? Text("Unknown")
+                      : Text(
+                          "Hello ${widget.name},",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -35,9 +70,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.all(3),
-                  child: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.white,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {});
+                    },
+                    child: const Icon(
+                      Icons.home_outlined,
+                      color: Colors.white,
+                    ),
                   ),
                 )
               ],
@@ -63,16 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 20,
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-             ItemWidget(Title: "Plain salad", subTitle: "Fresh and Healthy", Price: 14, ImagePath: "images/salad2.png"), ItemWidget(Title: "Mix Veg Salad", subTitle: "Fresh and Healthy", Price: 25, ImagePath: "images/salad3.png"), ItemWidget(Title: "Spicy with Onion", subTitle: "Fresh and Healthy", Price: 35, ImagePath: "images/salad4.png"),
-                ],
-              ),
-            ),
+            content,
             const SizedBox(
-              height: 20,
+              height: 70,
             ),
             Material(
               elevation: 5,
@@ -90,21 +123,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width:MediaQuery.of(context).size.width/2,
-                            child: const Text(
-                          "Mediterranean Chicken Salad",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: const Text(
+                            "Mediterranean Chicken Salad",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
                         ),
-
+                        const Text(
+                          "\$25",
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                       const Text("\$25",style: TextStyle(fontWeight: FontWeight.bold),),
                       ],
                     )
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -115,111 +151,71 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              IceCream = true;
-              burger = false;
-              pizza = false;
-              salad = false;
-            });
-          },
-          child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: IceCream ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(5),
-              child: Image.asset(
-                "images/ice-cream.png",
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-                color: IceCream ? Colors.white : Colors.black,
-              ),
+        Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            decoration: BoxDecoration(
+                color:  Colors.white,
+                borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.all(5),
+            child: Image.asset(
+              "images/ice-cream.png",
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+              color: Colors.black,
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              IceCream = false;
-              burger = false;
-              pizza = false;
-              salad = true;
-            });
-          },
-          child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: salad ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(5),
-              child: Image.asset(
-                "images/salad.png",
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-                color: salad ? Colors.white : Colors.black,
-              ),
+        Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.all(5),
+            child: Image.asset(
+              "images/salad.png",
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+              color:  Colors.black,
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              IceCream = false;
-              burger = true;
-              pizza = false;
-              salad = false;
-            });
-          },
-          child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: burger ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(5),
-              child: Image.asset(
-                "images/burger.png",
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-                color: burger ? Colors.white : Colors.black,
-              ),
+        Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            decoration: BoxDecoration(
+                color:  Colors.white,
+                borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.all(5),
+            child: Image.asset(
+              "images/burger.png",
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+              color:  Colors.black,
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              IceCream = false;
-              burger = false;
-              pizza = true;
-              salad = false;
-            });
-          },
-          child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pizza ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(5),
-              child: Image.asset(
-                "images/pizza.png",
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-                color: pizza ? Colors.white : Colors.black,
-              ),
+        Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            decoration: BoxDecoration(
+                color:  Colors.white,
+                borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.all(5),
+            child: Image.asset(
+              "images/pizza.png",
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+              color:  Colors.black,
             ),
           ),
         ),
